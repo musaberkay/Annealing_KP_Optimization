@@ -28,11 +28,36 @@ public class Main {
         Random random = new Random();
         
         // Start the simulated annealing process
-        // ..............
+        double temperature = MAX_TEMPERATURE;
+        while (temperature > 1) {
+            // Generator of new neighbor solution
+            boolean[] neighborSolution = Arrays.copyOf(currentSolution, currentSolution.length);
+            int randomIndex = random.nextInt(neighborSolution.length);
+            neighborSolution[randomIndex] = !neighborSolution[randomIndex];
 
+            // Calculation the fitness value of the neighbor solution
+            int neighborValue = calculateValue(neighborSolution);
 
+            // Calculation the acceptance probability of the neighbor solution
+            double acceptanceProbability = calculateAcceptanceProbability(currentValue, neighborValue, temperature);
 
-        
+            // Condition of accept or reject the neighbor solution
+            if (acceptanceProbability > random.nextDouble()){
+                currentSolution = neighborSolution;
+                currentValue = neighborValue;
+            }
+
+            // Update the best solution
+            if (currentValue > bestValue) {
+                bestSolution = Arrays.copyOf(currentSolution, currentSolution.length);
+                bestValue = currentValue;
+            }
+            System.out.println(currentValue + " " + bestValue);
+
+            //Decrease the temperature
+            temperature *= 1 - COOLING_RATE;
+        }
+
         // Print the best solution found
         System.out.println("Best Solution: " + Arrays.toString(bestSolution));
         System.out.println("Best Value: " + bestValue);
