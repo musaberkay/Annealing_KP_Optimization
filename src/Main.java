@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -28,6 +29,38 @@ public class Main {
         Random random = new Random();
         
         // Start the simulated annealing process
+        double[] ratio = new double[values.length];
+        for(int i=0 ; i < ratio.length; i++){
+            ratio[i] = (double) values[i]/weights[i];
+        }
+
+        boolean[] flag = Arrays.copyOf(currentSolution,currentSolution.length);
+
+        int currentCapacity = knapsackCapacity;
+        int count = flag.length;
+        while (count != 0) {
+            double max = 0;
+            int index = 0;
+            for(int i=0; i<ratio.length; i++){
+                if(max <= ratio[i] && !flag[i]) {
+                    max = ratio[i];
+                    index = i;
+                }
+            }
+
+            if(currentCapacity - weights[index] > 0){
+                currentSolution[index] = true;
+                currentValue += values[index];
+                currentCapacity -= weights[index];
+            }
+
+            flag[index] = true;
+            count--;
+        }
+
+        bestValue = currentValue;
+        bestSolution = currentSolution;
+
         double temperature = MAX_TEMPERATURE;
         while (temperature > 1) {
             // Generator of new neighbor solution
