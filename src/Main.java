@@ -38,6 +38,7 @@ public class Main {
 
         int currentCapacity = knapsackCapacity;
         int count = flag.length;
+
         while (count != 0) {
             double max = 0;
             int index = 0;
@@ -61,12 +62,24 @@ public class Main {
         bestValue = currentValue;
         bestSolution = currentSolution;
 
+        System.out.println(currentValue);
+
         double temperature = MAX_TEMPERATURE;
         while (temperature > 1) {
             // Generator of new neighbor solution
             boolean[] neighborSolution = Arrays.copyOf(currentSolution, currentSolution.length);
             int randomIndex = random.nextInt(neighborSolution.length);
-            neighborSolution[randomIndex] = !neighborSolution[randomIndex];
+
+            currentCapacity = calculateRemainingWeight(neighborSolution);
+
+            if(currentCapacity > weights[randomIndex] && neighborSolution[randomIndex] == false){
+                currentCapacity -= weights[randomIndex];
+                neighborSolution[randomIndex] = true;
+            }
+
+            else {
+                neighborSolution[randomIndex] = !neighborSolution[randomIndex];
+            }
 
             // Calculation the fitness value of the neighbor solution
             int neighborValue = calculateValue(neighborSolution);
@@ -120,5 +133,16 @@ public class Main {
         } else {
             return Math.exp((neighborValue - currentValue) / temperature);
         }
+    }
+
+    // Helper method to calculate the total remaining weight of neighborSolution
+    private static int calculateRemainingWeight(boolean[] solution) {
+        int weight = 0;
+        for (int i = 0; i < solution.length; i++) {
+            if (solution[i]) {
+                weight += weights[i];
+            }
+        }
+        return knapsackCapacity - weight;
     }
 }
