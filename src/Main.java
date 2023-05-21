@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -19,6 +18,7 @@ public class Main {
     private static int bestValue;
 
     public static void main(String[] args) {
+        long start = System.currentTimeMillis();
         // Initialize the solution state variables
         currentSolution = new boolean[values.length];
         bestSolution = new boolean[values.length];
@@ -27,8 +27,8 @@ public class Main {
         
         // Initialize the random number generator
         Random random = new Random();
-        
-        // Start the simulated annealing process
+
+        // Find the feasible solution in greedy way, which fill according to Value/Weight ratio
         double[] ratio = new double[values.length];
         for(int i=0 ; i < ratio.length; i++){
             ratio[i] = (double) values[i]/weights[i];
@@ -64,8 +64,12 @@ public class Main {
 
         System.out.println(currentValue);
 
+        // Start the simulated annealing process
+
         double temperature = MAX_TEMPERATURE;
-        while (temperature > 1) {
+        double threshold_temperature = 1;
+
+        while (temperature > threshold_temperature) {
             // Generator of new neighbor solution
             boolean[] neighborSolution = Arrays.copyOf(currentSolution, currentSolution.length);
             int randomIndex = random.nextInt(neighborSolution.length);
@@ -73,7 +77,6 @@ public class Main {
             currentCapacity = calculateRemainingWeight(neighborSolution);
 
             if(currentCapacity > weights[randomIndex] && neighborSolution[randomIndex] == false){
-                currentCapacity -= weights[randomIndex];
                 neighborSolution[randomIndex] = true;
             }
 
@@ -107,6 +110,10 @@ public class Main {
         // Print the best solution found
         System.out.println("Best Solution: " + Arrays.toString(bestSolution));
         System.out.println("Best Value: " + bestValue);
+
+        long end = System.currentTimeMillis();
+        System.out.println("Cooling Rate: " + COOLING_RATE + " - Execution Time: " + (end-start) + " ms");
+        System.out.println("Initial Temperature: " + MAX_TEMPERATURE + " - Stopping Temperature: " + threshold_temperature + " - Execution Time: " + (end-start) + " ms");
     }
     
     // Helper method to calculate the fitness value of a solution
